@@ -1,432 +1,120 @@
 ---
 name: vpappdesign
-description: VietPay app design system - onboarding flows, reward screens, components, and visual patterns
+description: VP mobile app's onboarding/rewards visual style — screen chrome, mascot illustration system, color/type tokens, and component catalog — verified directly against the 'intro-flow' and 'first-network&contact' Figma flows in the 'Draft pool' file.
 ---
 
-# VietPay App Design System
+# VP App Design Style (intro-flow + first-network&contact)
 
-Design patterns extracted from VietPay merchant referral onboarding flows. Use for implementing screens matching existing VietPay mobile app style.
+This skill distills the visual style of the VP app's mobile flows from two Figma boards in the **"Draft pool"** file (also the source for the project's `/vpdesignsys` skill):
 
-## Screen Dimensions
+- **Flow 1 — "intro-flow"**: `https://www.figma.com/design/Jznca6B8f4Kt6l8SCHDb4l/Draft-pool?node-id=754-1375` (node `754:1375`) — onboarding: refer merchants → estimate income → avatar setup → milestone rewards (1,000 → 4,000 pts) → invite video.
+- **Flow 2 — "first-network&contact"**: `https://www.figma.com/design/Jznca6B8f4Kt6l8SCHDb4l/Draft-pool?node-id=754-1376` (node `754:1376`) — check-in streak → referral/network dashboard → contact sync → contact selection → invite → earnings summary.
 
-**Mobile Canvas**: 390×844px (iPhone standard)
-- Safe area top: 40px (status bar) + 60px (header) = 100px total
-- Safe area bottom: 5px home indicator + 20px padding
-- Content area: 390×739px
+File key: `Jznca6B8f4Kt6l8SCHDb4l`. Node `754:1376` is too large for `get_metadata`/`get_design_context` to expand (returns a sparse stub) — use `get_screenshot` at high `maxDimension` for that one, or drill into its sub-frames once you have concrete child node IDs.
 
-## Color System
+Every value below (hex codes, font, radii, component specs) was pulled directly from Figma (`get_variable_defs`, `get_design_context`, or inspecting live node properties via `use_figma`) — not guessed or templated. If you need a value not covered here, pull it live from Figma rather than inventing one.
 
-### Primary Colors
-```css
---vp-primary-blue: #0066CC;        /* CTAs, interactive elements */
---vp-navy: #001F3F;                /* Headers, logo background */
---vp-white: #FFFFFF;               /* Backgrounds, cards */
---vp-gold: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%); /* Points display */
-```
+## How to use this
 
-### Neutral Colors
-```css
---vp-gray-50: #F8F9FA;
---vp-gray-100: #E9ECEF;
---vp-gray-600: #6C757D;
---vp-gray-900: #212529;
-```
+1. When building or modifying a VP app screen/flow, read the relevant section below for the pattern that applies (chrome, mascot pose, component, color, type).
+2. Reuse the hex values and Be Vietnam Pro type styles as-is — don't invent new colors or fonts for VP app screens.
+3. Before adding a new component pattern not covered here, pull it from Figma with `get_design_context` (load `figma-design-to-code` first) against the two node IDs above, or their sub-frames, rather than guessing.
+4. Every new flow must still follow the project's action-by-action rule (one action per screen, mascot celebration on completion, documented in the project `CLAUDE.md`). This skill supplies the *look*, that rule supplies the *structure*; both apply together.
 
-### Semantic Colors
-```css
---vp-success: #28A745;
---vp-error: #DC3545;
---vp-warning: #FFC107;
-```
+## Screen chrome (every screen)
+
+- **Frame**: iPhone-shaped canvas, 390×844, corner radius 40px, soft ambient shadow `0px 20px 48px rgba(0,0,0,0.28)`.
+- **Status bar**: placeholder iOS bar — "9:41" (SemiBold 14px white) + signal/wifi/battery glyphs, sits inside the header band.
+- **Header, two variants**:
+  - *Onboarding variant* (used across all of Flow 1 and the first screens of Flow 2): plain navy band, centered white "vietpay" logo only. Background `#0d2c52` (`pri-deep`), height 100px (status bar 40px + 60px logo band).
+  - *In-app variant* (used once the user is inside network/contacts/check-in screens): same navy band, but 3-slot row — back chevron `‹` (left), "vietpay" logo (center), home/building icon (right). Same `#0d2c52` background.
+- **Footer progress bar**: a thin rounded pill (~132–140px wide, 5px tall, `#0d3c7d` at ~40% opacity) centered just above the home indicator — a lightweight flow-progress affordance, not step dots and not a tab bar. Pure celebration screens (points reveal) may omit it.
+- **Home indicator**: standard iOS bar, `#1c1d1b`, 134×5px, rounded, centered.
+- **Safe-area content padding**: 24px horizontal margins throughout; primary CTA sits in a footer region with 20px bottom padding.
+
+## Mascot & illustration system
+
+A single recurring illustrated character (dark-haired woman, mustard/tan blazer, white top, navy pants) appears on nearly every screen — she *is* the app's guidance and feedback mechanism, not decoration:
+
+- **Pointing pose**: arm extended outward, forearm rendered as a horizontal **dashed guide line ending at her fingertip**, literally pointing down/across at the interactive element beneath her (reward card, stepper, avatar picker, radio group). Used on informational/input screens. Asset name pattern: `point down 3`.
+- **Jumping/celebrating pose**: mid-air jump with scattered confetti pieces (pink/blue/purple torn-paper shapes), used on every pure-reward/points-milestone screen (e.g. "1,000 points", "2,000 points" … "4,000 points", "3-day streak" milestones). No other content competes on these screens — mascot + confetti + big point number + progress bar only.
+- **Idle/context pose**: smaller, upper-portion placement, arm relaxed, used on dashboard-style screens (My Network, Earnings) where she sits above a data card rather than pointing at a single control.
+- Treat the mascot + confetti pairing as the mandatory "celebration" visual for the action-by-action rule's per-step celebration requirement — don't substitute a generic checkmark/toast for it on milestone screens (a plain green checkmark + "Congratulations!" text is reserved for lighter confirmations like a daily check-in or a reminder/nudge sent, not real point-value milestones).
+
+## Color tokens (confirmed via Figma variables + design context)
+
+| Token | Hex | Use |
+|---|---|---|
+| `pri-deep` | `#0d2c52` | Header/status-bar band background |
+| `Deep Blue` | `#0d3c7d` | Headlines, primary CTA button background, active footer progress bar |
+| `Primary Blue` / `brand/primary` | `#0073bf` | Stat highlights (reward amount), plus-button fill, links ("Invite"/"Remind"/"Nudge") |
+| `Primary Blue Hover` | `#003D8F` | Pressed/hover state of Primary Blue |
+| `Gold Accent` / `brand/gold` / `accent/gold` | `#d7a44c` | Highlighted point values inside CTA labels ("CLAIM **1,000 pt**"), gold milestone number text |
+| `Lime Green` / `accent/lime` | `#73bf26` | Success checkmark circle, selected radio ring |
+| `Near Black` / `neutral/900` / `Text Primary` | `#1c1d1b` | Primary body text, home indicator |
+| `Gray` / `Text Muted` | `#696b68` | Secondary/meta text (e.g. "≈ 15,000,000 ₫", "Level 2") |
+| `Interactive / Disabled` | `#a9aba8` | Disabled control state (also seen as a flatter `#6b7370` on a disabled full-width CTA) |
+| `Border / Default` / `neutral/300` | `#dfdfdf` (also seen `#dedede`) | Card and input borders |
+| `bd` | `#e3e0da` | Warmer alternate border (cream-background screens) |
+| `White` / `neutral/0` | `#ffffff` | Page/card background |
+| `shell` | `#fdfbf7` | Warm off-white full-screen background (streak/sync screens) |
+| `cardBg` | `#f7f8fb` | Neutral card background |
+| `accent/blue-tint` | `#eaf6fd` (also seen `#eaf4fc`) | Reward/estimate card background |
+| `Light Blue` / `accent/light-blue` | `#bfe0f5` | Streak-day chip background, secondary highlight, avatar circle fill |
+| `acc-tint` | `#ffede9` | Peach/coral banner background ("Get 30,000 pts", referral prompts) |
+| `semantic/warning-surface` | `#fbeed1` | Pale gold surface (tier badge / bonus callouts) |
+| `neutral/500` | `#696b68` | Mid-gray, disabled text |
+| `neutral/200` | `#ededed` | Lightest neutral surface |
+
+Shadows are soft and often **color-tinted to match the element**, not flat black:
+- Reward card: `0px 12px 16px rgba(0,115,191,0.1)`
+- Primary CTA button: `0px 8px 8px rgba(0,115,191,0.13)`
+- Stepper control: `0px 2px 2px rgba(0,0,0,0.15)`
+- Generic card: `0px 2px 8px rgba(0,0,0,0.078)` (`Shadow/Card` token)
+- Phone frame: `0px 20px 48px rgba(0,0,0,0.28)`
 
 ## Typography
 
-### Font Families
-- **Primary**: System fonts (SF Pro on iOS, Roboto on Android)
-- **Fallback**: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+Single family throughout: **Be Vietnam Pro** (NOT system fonts — do not substitute SF Pro/Roboto), weights Medium / SemiBold / Bold / ExtraBold.
 
-### Type Scale
-```css
---text-display-large: 48px / 1.1 / 700;     /* Point numbers */
---text-headline: 24px / 1.3 / 700;          /* Screen titles */
---text-title: 20px / 1.4 / 600;             /* Section headers */
---text-body: 16px / 1.5 / 400;              /* Body text */
---text-label: 14px / 1.4 / 500;             /* Labels, captions */
---text-caption: 12px / 1.3 / 400;           /* Small text */
-```
+| Style | Spec |
+|---|---|
+| Screen headline | ExtraBold, 34px / 38px line-height, `Deep Blue`, centered, wraps to 2 lines |
+| Milestone number ("2,000 points") | ExtraBold, large (~48–64px), gold gradient/`Gold Accent` |
+| Heading 3 | SemiBold, 18px / 26px |
+| Heading 4 | SemiBold, 14px / 20px |
+| Body | SemiBold, 16px / 24px |
+| Button label | SemiBold, 16px / 20px, letter-spacing 1px, uppercase for CTA verb |
+| Eyebrow/label (e.g. "YOUR ESTIMATED REWARD") | Bold, 11px, uppercase, letter-spacing 1.5px, `Primary Blue` |
+| Meta/secondary text | SemiBold or Medium, 14–18px, `Gray` |
 
-### Text Patterns
-- **Points Display**: Gold gradient, 48px+, center-aligned
-- **Headings**: Navy or dark gray, 24px, bold, center-aligned for onboarding
-- **CTAs**: White on blue, 16px, 500 weight, uppercase or sentence case
-- **Labels**: Gray-600, 14px, medium weight
+## Component catalog
 
-## Layout Patterns
+- **Primary CTA button** — full-width minus 24px margins, height 56px, radius **14px** (not 28px — mobile buttons here are not pill-shaped), `Deep Blue` background (or `#6b7370`/`Interactive Disabled` when inactive), white bold label; the point-value portion of the label is set in `Gold Accent` and a heavier weight than the verb ("CLAIM **1,000 pt**") — this two-tone CTA label is the standard "claim" pattern. Real component: local `Button` set with variants `Type={Primary,Secondary,Ghost} × Size={Small,Medium,Large}` — Large is 56px tall, radius 12px, fill bound to `brand/primary`.
+- **Ghost button** (e.g. "Invite" link inside a list row) — transparent background, `brand/primary` blue text, Be Vietnam Pro SemiBold 12px, padding 16px/8px, radius 8px.
+- **Reward/estimate card** — `accent/blue-tint` background, 1px `Border/Default`, radius 14–24px, colored blue drop shadow, centered stacked content: uppercase eyebrow → huge number → muted VND-equivalent subtext.
+- **Stepper control** — pill-shaped white container (radius 100px, soft shadow), circular minus button (light gray `cardBg` fill) and circular plus button (`Primary Blue` fill, white glyph) flanking a large bold number.
+- **Radio/avatar picker** — white card, radius 24px, top row of labeled radio buttons (36px circle, `Lime Green` fill + blue ring when selected) above a row of circular avatar thumbnails (104px) matching each option.
+- **Text input** — white background, 1px `Border/Default`, radius 16px, height 56px, 16px horizontal padding, 18px SemiBold placeholder/value text in `Gray`.
+- **Upload card** — bordered card with a circular icon badge (camera), instructional label, and a pill-shaped secondary "Browse photos" button below it.
+- **Stat/list row ("My Network")** — icon + label left, value right-aligned, thin divider between rows, a right-aligned `Primary Blue` link ("Invite" / "Remind" / "Nudge") as the row's action.
+- **Checkbox** — 20×20px, radius 6px. Checked: fill + stroke `brand/primary` blue, white checkmark icon (2px stroke, ~8×5.5px glyph) centered. Unchecked: transparent fill, 1–1.5px `neutral/500`/`Border Default` gray stroke.
+- **Avatar (initials)** — 36×36px circle (radius 18), fill `Light Blue` (`#bfe0f5`), centered initial letter in Be Vietnam Pro SemiBold 14px, `Near Black` text.
+- **Contact checklist** — "Select All" header row with a live counter ("4 of 6 Selected"), then rows of circular checkbox (`Primary Blue` when checked) + avatar placeholder + name, divided by hairlines.
+- **Share row** — "Share" label above 4 evenly-spaced circular icon buttons (Zalo, Messenger, SMS, Email — each brand-colored) with a caption under each icon.
+- **Referral link field** — light card showing the truncated link plus a small copy-icon button.
+- **Status/tier badge** — small rounded pill (radius 999, pill-shaped), e.g. "Silver" white bold text on `Gold Accent` (#d7a44c) fill, placed beside the user's name/profile card.
+- **Success confirmation (light-weight)** — centered `Lime Green` circular checkmark (48–64px) + bold "Congratulations!"/status headline + muted one-line subtext, often followed by a small "Summary" card (label/value rows). Reserved for confirmations that either carry no point reward (e.g. "Reminder Sent!") or a modest one — NOT for real point milestones (those use the full mascot+confetti pattern instead, per the rule above).
+- **Loading/sync state** — centered hourglass/spinner glyph + bold status label ("Synching contacts"), with the primary CTA visible but disabled (`Interactive Disabled`) until the async step completes.
+- **Streak/check-in chip row** — horizontal row of day chips (circle, `Light Blue`/`Deep Blue` fill for done/today, white/outline for future) with a day-letter and date, above a single "Check in today" CTA.
 
-### Header (100px total)
-```
-Status Bar (40px)
-├─ Time: 9:41 (left, 24px padding)
-└─ Icons: Signal, WiFi, Battery (right, 16px padding)
+## Spacing & radius scale
 
-Header Bar (60px)
-└─ VietPay Logo (centered, 110×43px)
-```
+- Side margins: 24px (near-universal container padding); some list/card screens use 16px — check the specific screen before assuming.
+- Stack gaps: 24px between major blocks, 16–20px between related controls, 8px for tight label/value pairs.
+- Radius scale (confirmed Figma variables): `radius/sm` 4px, `radius/md` 6–8px, `radius/lg` 8px (small cards, buttons), 24px (feature cards, hand-built), 40px (phone frame), `radius/pill` 999px (pills, stepper, progress bar, chips, badges).
+- Spacing scale (confirmed Figma variables): `space/xs` 4px, `space/sm` 8px, `space/md` 16px, `space/lg` 24px, `space/xl` 32px, `space/2xl` 48px, `space/3xl` 64px, `space/4xl` 96px.
 
-### Content Container
-- **Side padding**: 24px
-- **Vertical spacing**: 16px between sections, 24px between major blocks
-- **Card padding**: 24px
-- **Border radius**: 16px (cards), 28px (buttons), 12px (inputs)
+## Not yet verified — pull from Figma before relying on it
 
-### Bottom CTA Pattern
-```
-Primary Button (56px height)
-├─ Position: 24px from sides, 8px from bottom indicator
-├─ Text: Centered, white, 16px medium
-└─ Background: Primary blue, 28px border radius
-
-Home Indicator (5px height)
-└─ Position: Centered horizontally, 80px from bottom edge
-```
-
-## Component Library
-
-### 1. Reward Celebration Screen
-**Usage**: Milestone achievements (1000, 2000, 3000, 4000 points)
-
-**Structure**:
-```
-- Header (100px)
-- Gold points text (48px gradient): "X,XXX points"
-- Illustration (mascot with confetti, ~500×400px centered)
-- Bottom padding (20px)
-- Home indicator
-```
-
-**Key elements**:
-- Confetti animation overlay (multicolor: pink, yellow, blue, purple)
-- Mascot illustration: Character in yellow blazer, blue pants
-- No CTA button (auto-advances or user-dismissable)
-
-### 2. Estimate/Calculator Screen
-**Usage**: Input flows with numeric steppers
-
-**Structure**:
-```
-- Header (100px)
-- Headline text (center, 24px bold)
-- Illustration (point-down character, ~370×250px)
-- Reward card (white card, 16px radius)
-  ├─ Label: "Your Estimated Reward" (14px gray)
-  ├─ Points: "15,000 pt" (40px bold)
-  └─ Currency: "≈ 15,000,000 ₫" (18px gray)
-- Input section (24px padding)
-  ├─ Label + Level indicator
-  └─ Stepper (- [value] +)
-- CTA button: "CLAIM X pt"
-```
-
-**Stepper component**:
-- Height: 67px
-- Buttons: 40×40px circles, light gray border
-- Value: 40px center, bold
-- +/- symbols: 24px
-
-### 3. Avatar Selection Screen
-**Usage**: User profile setup, gender/photo selection
-
-**Structure**:
-```
-- Header (100px)
-- Headline (center)
-- Illustration (point-down character)
-- Selection card (white, 16px radius)
-  ├─ Radio group (horizontal, gender)
-  │  └─ Radio: 36px circle, 24px inner dot when selected
-  └─ Avatar grid (2 options, 104×104px circles)
-- Text input field (56px height)
-- CTA button
-```
-
-**Radio button**:
-- Outer circle: 36px, 2px border (blue when selected, gray default)
-- Inner circle: 24px, solid blue
-- Label: 16px, 8px spacing from radio
-
-### 4. Upload Screen
-**Usage**: Photo/document upload
-
-**Structure**:
-```
-- Header (100px)
-- Headline
-- Illustration (point-down character)
-- Upload card (342×271px, white, 16px radius, center)
-  ├─ Camera icon (120×120px circle, light gray bg)
-  ├─ Upload text (16px)
-  └─ Browse button (195×44px, blue, icon + text)
-```
-
-**Upload button**:
-- Icon: Upload arrow, 19×19px
-- Text: "Browse photos" (16px)
-- Combined width: auto-fit content
-- Blue background, white text
-
-### 5. List Selection Screen
-**Usage**: Contact sync, network selection
-
-**Structure**:
-```
-- Header (100px)
-- Headline/description
-- List container (scrollable)
-  └─ List items (56px height each)
-      ├─ Checkbox/icon (left, 24px)
-      ├─ Label (center-left)
-      └─ Secondary text (right, gray)
-- CTA button (bottom)
-```
-
-**List item**:
-- Height: 56px
-- Padding: 16px horizontal
-- Border bottom: 1px solid gray-100
-- Checkbox: 24×24px, blue when checked
-- Touch target: Full row height
-
-### 6. Intro/Welcome Screen
-**Usage**: Feature explanation, value proposition
-
-**Structure**:
-```
-- Header (100px)
-- Headline (multi-line, bold, navy)
-- Timer badge (optional, top-right)
-  └─ "XX sec" (rounded pill, gray bg)
-- Hero illustration (full-width, 370×550px)
-- Auto-advance or swipe gesture
-```
-
-**Timer badge**:
-- Size: 102×48px (auto-width)
-- Background: Gray-100
-- Border radius: 24px
-- Text: 18px medium, gray-600
-
-### 7. Social Platform Selection
-**Usage**: Connect social accounts
-
-**Structure**:
-```
-- Platform icons grid (4 columns)
-  └─ Each: 56×56px circle
-      ├─ Brand color background
-      ├─ White icon (24×24px)
-      └─ Spacing: 12px between
-```
-
-**Platform colors**:
-- Facebook: #1877F2
-- Zalo: #0068FF
-- WhatsApp: #25D366
-- Messenger: Linear gradient
-
-## Illustration System
-
-### Mascot Character
-**Description**: Professional woman in yellow blazer, navy blue pants
-- **Style**: Friendly, approachable, semi-realistic cartoon
-- **Skin tone**: Light tan (#F5C097)
-- **Hair**: Black, shoulder-length, casual style
-- **Poses**: 
-  - Pointing right (intro/direction)
-  - Arms spread wide (celebration/welcome)
-  - Holding phone/object (action states)
-
-### Supporting Graphics
-- **Confetti**: Multicolor rectangles/circles, random rotation
-- **Point-down arrows**: Curved illustration, ~370×250px, gray tone
-- **Gradient overlays**: Subtle radial gradients on celebration screens
-
-## Animation Patterns
-
-### Screen Transitions
-- **Default**: Slide from right, 300ms ease-out
-- **Celebration screens**: Scale up from 0.8 to 1.0, 400ms spring
-- **Confetti**: Cascade from top, staggered 50ms delays
-
-### Micro-interactions
-- **Button press**: Scale to 0.95, 100ms
-- **CTA ripple**: Circular ripple effect from touch point
-- **Number increment**: Count-up animation, 800ms duration
-- **Checkbox toggle**: Scale + fade, 200ms
-
-### Loading States
-- **Skeleton**: Gray-100 background, shimmer effect
-- **Spinner**: Blue circular, 24px diameter
-
-## Spacing System
-
-**Base unit**: 4px
-
-```css
---space-1: 4px;
---space-2: 8px;
---space-3: 12px;
---space-4: 16px;
---space-5: 20px;
---space-6: 24px;
---space-8: 32px;
---space-10: 40px;
---space-12: 48px;
---space-16: 64px;
-```
-
-**Common applications**:
-- Screen edge padding: 24px (space-6)
-- Card padding: 24px (space-6)
-- Section spacing: 16px (space-4)
-- Component gap: 12px (space-3)
-- Icon-text gap: 8px (space-2)
-
-## Icon System
-
-### Icon Library
-Use outlined style icons (2px stroke weight)
-
-**Common icons**:
-- Camera (upload)
-- Upload arrow (file upload)
-- Checkmark (success, selection)
-- Plus/Minus (stepper)
-- iOS status bar icons (signal, wifi, battery)
-
-**Sizes**:
-- Small: 16×16px (inline text)
-- Medium: 24×24px (buttons, list items)
-- Large: 56×56px (feature icons)
-- Extra large: 120×120px (empty states)
-
-## Form Patterns
-
-### Text Input
-```css
-Height: 56px
-Padding: 16px horizontal
-Border: 1px solid gray-200
-Border-radius: 12px
-Font: 16px regular
-Placeholder: gray-400
-Focus: Blue border, 2px
-```
-
-### Radio Group (Horizontal)
-- Spacing: 24px between options
-- Alignment: Center vertical
-- Active state: Blue border + fill
-
-### Checkbox
-- Size: 24×24px
-- Border: 2px solid gray-300
-- Checked: Blue background, white checkmark
-- Border radius: 4px
-
-## Accessibility
-
-### Touch Targets
-- Minimum: 44×44px (iOS HIG)
-- Buttons: 56px height
-- List items: 56px+ height
-- Steppers: 40×40px (grouped, acceptable)
-
-### Color Contrast
-- Text on white: ≥4.5:1 (WCAG AA)
-- CTA button: White on blue ≥4.5:1
-- Avoid text on gradient backgrounds
-
-### Text Scaling
-Support iOS Dynamic Type up to 150%
-
-## Implementation Notes
-
-### When to Use This Skill
-Implement VietPay mobile screens for:
-- Onboarding flows
-- Reward/gamification screens
-- Profile setup
-- Contact/network sync
-- Celebration/milestone moments
-
-### Key Principles
-1. **Consistent mascot**: Use character illustration on every screen for brand continuity
-2. **Progressive rewards**: Celebrate milestones (1k, 2k, 3k, 4k points pattern)
-3. **Clear CTAs**: Single primary action per screen, bottom-aligned
-4. **Visual hierarchy**: Illustration → Points/reward → CTA flow
-5. **Friendly tone**: Rounded corners, soft colors, approachable copy
-6. **Step indicators**: Show progress when in multi-step flows
-
-### Code Example: Reward Screen (React Native)
-```jsx
-<Screen>
-  <VPHeader />
-  
-  <View style={styles.content}>
-    <Text style={styles.pointsDisplay}>
-      1,000 points
-    </Text>
-    
-    <Image 
-      source={require('./mascot-celebration.png')}
-      style={styles.illustration}
-    />
-    
-    <ConfettiOverlay />
-  </View>
-  
-  <HomeIndicator />
-</Screen>
-
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  pointsDisplay: {
-    fontSize: 48,
-    fontWeight: '700',
-    background: 'linear-gradient(135deg, #D4AF37 0%, #FFD700 100%)',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  illustration: {
-    width: 267,
-    height: 400,
-    resizeMode: 'contain',
-  },
-});
-```
-
-## Checklist: Before Shipping a VietPay Screen
-
-- [ ] Header with VietPay logo centered
-- [ ] Status bar placeholder (iOS: 9:41 time)
-- [ ] Home indicator bar at bottom (iOS)
-- [ ] Mascot illustration present
-- [ ] Primary CTA 56px height, 28px radius, blue background
-- [ ] Side padding 24px
-- [ ] Border radius 16px on cards
-- [ ] Font weights: 700 for headings, 400-500 for body
-- [ ] Touch targets ≥44×44px
-- [ ] Color contrast ≥4.5:1
-- [ ] Confetti overlay on celebration screens
-- [ ] Gold gradient on point numbers
-- [ ] Screen dimensions: 390×844px (mobile)
-
----
-
-**Last updated**: Based on Figma designs analyzed 2026-08-19
-**Source**: Draft-pool Figma file, nodes 754:1375 (intro flow) & 754:1376 (network flow)
+The GitHub-hosted draft of this skill previously included generic web-app patterns (desktop modals, data tables, dark mode, CSS breakpoints, SF Pro/Roboto fonts, `#0066CC`/`#001F3F` colors) that do **not** match this Figma file and were removed. If a future task needs any of those (e.g. a merchant-portal admin table), verify it directly against the actual "style guide and design system" page (node `693:30`, file `Jznca6B8f4Kt6l8SCHDb4l`) via `get_design_context`/`get_variable_defs` rather than reusing generic web conventions — this app is mobile-only as far as verified content goes.
